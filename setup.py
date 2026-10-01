@@ -9,7 +9,6 @@ setup(
     install_requires=[
         'typing',
         'pydantic',
-        'json',
         'os',
         'uuid',
         'rich',
