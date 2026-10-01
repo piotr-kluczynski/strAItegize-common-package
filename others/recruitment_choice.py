@@ -1,6 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
-from pydantic import Field
 
 class RecruitmentChoice(BaseModel):
     unit_type: Literal["light_infantry", "heavy_infantry", "cavalry"] = Field(

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any
 
-from shared.order import Order
+from others.order import Order
 
 # Observation Model
 class TileObservation(BaseModel):
