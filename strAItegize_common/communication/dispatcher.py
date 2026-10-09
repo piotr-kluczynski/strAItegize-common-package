@@ -12,7 +12,7 @@ class CommandDispatcher:
 
         return decorator
 
-    def dispatch(self, message: dict, sim_context: Any) -> dict:
+    def dispatch(self, message: dict, sim_context: Any, sending_player: str) -> dict:
         message_type = message.get("type")
         payload = message.get("payload", {})
 
@@ -24,7 +24,7 @@ class CommandDispatcher:
             }
 
         try:
-            response_payload = handler(payload, sim_context)
+            response_payload = handler(payload, sim_context, sending_player)
 
             return {
                 "type": "RESPONSE",
