@@ -1,5 +1,4 @@
 import os
-import pprint
 import uuid
 
 from rich.console import Console, Group
@@ -13,39 +12,69 @@ from typing import Optional
 from langchain_core.messages import BaseMessage, AIMessage
 
 def prompt_recursive(console: Console, schema: dict, defs: dict = None) -> dict:
-    pprint.pp(schema)
-    pprint.pp(defs)
-
     schema_properties = schema["properties"]
     args = {}
 
+    # Storing definitions of nested objects (pydantic flattens the nested definitions)
     if defs is None:
         defs = schema.get("$defs", {})
 
     for key, details in schema_properties.items():
-        excepted_type = details.get("type", "string")
+        # Handling Optional values (None by default)
+        is_optional = "default" in details or any(t.get("type") == "null" for t in details.get("anyOf", []))
 
-        if "$ref" in details.get("allOf", [{}])[0]:
+        if "anyOf" in details:
+            types = [t.get("type") for t in details["anyOf"] if t.get("type") != "null"]
+            excepted_type = types[0] if types else "string"
+        else:
+            excepted_type = details.get("type", "string")
+
+        ref_str = details.get("$ref")
+        if not ref_str and "allOf" in details:
+            ref_str = details["allOf"][0].get("$ref")
+
+        if ref_str:
             console.print(f"[bold cyan]--- Entering nested object: {key} ---[/bold cyan]")
 
             # Retrieving the proper object properties from $defs
-            nested_obj_name = details["allOf"][0]["$ref"].split("/")[-1]
+            nested_obj_name = ref_str.split("/")[-1]
             nested_obj_schema = defs[nested_obj_name]
     
             args[key] = prompt_recursive(console, nested_obj_schema, defs=defs)
             
             console.print(f"[bold cyan]--- Exiting nested object: {key} ---[/bold cyan]")
         elif excepted_type == "integer":
-            user_input = Prompt.ask(f"{key} (integer)")
-            args[key] = int(user_input)
+            prompt_label = f"{key} (integer, optional)" if is_optional else f"{key} (integer)"
+
+            user_input = Prompt.ask(prompt_label)
+            if is_optional and user_input == "":
+                args[key] = None
+            else:
+                args[key] = int(user_input)
         elif excepted_type == "boolean":
-            user_input = Prompt.ask(f"{key} (boolean)")
-            args[key] = user_input.lower() in ["true", "t", "yes", "y", "1"]
+            prompt_label = f"{key} (boolean, optional)" if is_optional else f"{key} (boolean)"
+
+            user_input = Prompt.ask(prompt_label)
+            if is_optional and user_input == "":
+                args[key] = None
+            else:
+                args[key] = user_input.lower() in ["true", "t", "yes", "y", "1"]
         elif excepted_type == "array":
-            user_input = Prompt.ask(f"{key} (comma-separated list)")
-            args[key] = [x.strip() for x in user_input.split(",") if x.strip()]
+            prompt_label = f"{key} (comma-separated list, optional)" if is_optional else f"{key} (comma-separated list)"
+
+            user_input = Prompt.ask(prompt_label)
+            if is_optional and user_input == "":
+                args[key] = None
+            else:
+                args[key] = [x.strip() for x in user_input.split(",") if x.strip()]
         else:
-            args[key] = Prompt.ask(f"{key} (string)")
+            prompt_label = f"{key} (string, optional)" if is_optional else f"{key} (string)"
+
+            user_input = Prompt.ask(prompt_label)
+            if is_optional and user_input == "":
+                args[key] = None
+            else:
+                args[key] = user_input
 
     return args 
 
