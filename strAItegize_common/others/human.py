@@ -11,15 +11,25 @@ from rich.table import Table
 from typing import Optional
 from langchain_core.messages import BaseMessage, AIMessage
 
-def prompt_recursive(console: Console, schema_properties: dict) -> dict:
+def prompt_recursive(console: Console, schema: dict, defs: dict = None) -> dict:
+    schema_properties = schema["properties"]
     args = {}
+
+    if defs is None:
+        defs = schema.get("$defs", {})
 
     for key, details in schema_properties.items():
         excepted_type = details.get("type", "string")
 
-        if excepted_type == "object" and "properties" in details:
+        if "$ref" in details.get("allOf", [{}])[0]:
             console.print(f"[bold cyan]--- Entering nested object: {key} ---[/bold cyan]")
-            args[key] = prompt_recursive(details["properties"])
+
+            # Retrieving the proper object properties from $defs
+            nested_obj_name = details["allOf"][0]["$ref"].split("/")[-1]
+            nested_obj_schema = defs[nested_obj_name]
+    
+            args[key] = prompt_recursive(console, nested_obj_schema, defs=defs)
+            
             console.print(f"[bold cyan]--- Exiting nested object: {key} ---[/bold cyan]")
         elif excepted_type == "integer":
             user_input = Prompt.ask(f"{key} (integer)")
@@ -40,7 +50,7 @@ def make_tool_call(console: Console, tool) -> dict:
 
     # Prompting user for all tool args
     if tool.args is not None:
-        args = prompt_recursive(console, tool.args)
+        args = prompt_recursive(console, tool.get_input_schema().model_json_schema())
 
     return {
         "name": tool.name,
