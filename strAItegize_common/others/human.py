@@ -1,4 +1,5 @@
 import os
+import pprint
 import uuid
 
 from rich.console import Console, Group
@@ -12,6 +13,9 @@ from typing import Optional
 from langchain_core.messages import BaseMessage, AIMessage
 
 def prompt_recursive(console: Console, schema: dict, defs: dict = None) -> dict:
+    pprint.pp(schema)
+    pprint.pp(defs)
+
     schema_properties = schema["properties"]
     args = {}
 
