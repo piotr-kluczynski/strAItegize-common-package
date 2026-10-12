@@ -82,8 +82,9 @@ def make_tool_call(console: Console, tool) -> dict:
     args = {}
 
     # Prompting user for all tool args
-    if tool.args is not None:
-        args = prompt_recursive(console, tool.get_input_schema().model_json_schema())
+    if tool.args:
+        schema = getattr(tool, "tool_call_schema", tool.get_input_schema()).model_json_schema()
+        args = prompt_recursive(console, schema)
 
     return {
         "name": tool.name,
