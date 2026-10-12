@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, List, Any
 
 from others.order import Order
+from others.recruitment_choice import RecruitmentChoice
 
 # Observation Model
 class TileObservation(BaseModel):
@@ -43,6 +44,9 @@ class GetRegionDetailsRequest(BaseModel):
 class IssueOrdersReuqest(BaseModel):
     orders: List[Order]
 
+class RecruitmentChoiceRequest(BaseModel):
+    recruitment: List[RecruitmentChoice]
+
 class MessagePlayerRequest(BaseModel):
     pass
 
@@ -82,6 +86,9 @@ class GetPlayersResponse(BaseModel):
     players_list: List[str]
 
 class IssueOrdersResponse(BaseModel):
+    pass
+
+class RecruitmentChoiceResponse(BaseModel):
     pass
 
 class MessagePlayerResponse(BaseModel):
