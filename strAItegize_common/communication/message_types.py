@@ -1,0 +1,22 @@
+from enum import Enum
+
+class MessageType(Enum):
+    ObserveUnit = "OBSERVE_UNIT"
+    ObserveRegion = "OBSERVE_REGION"
+    GetUnits = "GET_UNITS"
+    GetRegions = "GET_REGIONS"
+    GetUnitDetails = "GET_UNIT_DETAILS"
+    GetPlayers = "GET_PLAYERS"
+    IssueOrders = "ISSUE_ORDERS"
+    RecruitUnits = "RECRUIT_UNITS"
+    Ready = "READY"
+    Upkeep = "UPKEEP"
+    Error = "ERROR"
+    StateUpdate = "STATE_UPDATE"
+    StartSession = "START_SESSION"
+    EndSession = "END_SESSION"
+    JoinSession = "JOIN_SESSION"
+    StartSimulation = "START_SIMULATION"
+    EndSimulation = "END_SIMULATION"
+    StartRound = "START_ROUND"
+    EndRound = "END_ROUND"
