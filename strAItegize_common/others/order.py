@@ -2,6 +2,9 @@ from pydantic import BaseModel, Field
 from typing import Literal, Optional
 
 class Order(BaseModel):
+    """
+    Data class defining an order given to unit identified by given unit_id.
+    """
     order_type: Literal["move", "hold", "attack", "support"] = Field(
         description="The category of the order given to the unit."
     )
