@@ -10,6 +10,8 @@ class MessageType(Enum):
     IssueOrders = "ISSUE_ORDERS"
     RecruitUnits = "RECRUIT_UNITS"
     Ready = "READY"
+    Acknowledge = "ACKNOWLEDGE"
+    RepeatLast = "REPEAT_LAST"
     Upkeep = "UPKEEP"
     Error = "ERROR"
     StateUpdate = "STATE_UPDATE"
