@@ -12,6 +12,17 @@ from typing import Optional
 from langchain_core.messages import BaseMessage, AIMessage
 
 def prompt_recursive(console: Console, schema: dict, defs: dict = None) -> dict:
+    """
+    Function for recursively prompting user each of the arguments required by the schema.
+
+    Args:
+    - console: Console - object from rich library used for managing the console screen content,
+    - schema: dict - schematic containing all data required from the user,
+    - defs: dict - dictionary containing all complex object schematics, referenced in the original schema.
+
+    Returns:
+    filled_schema: dict - dictionary containing keys from the provided schema, and values given by the user.
+    """
     schema_properties = schema["properties"]
     args = {}
 
@@ -79,6 +90,17 @@ def prompt_recursive(console: Console, schema: dict, defs: dict = None) -> dict:
     return args 
 
 def make_tool_call(console: Console, tool) -> dict:
+    """
+    Function starting the tool call creation process, allowing user to fill in necessary arguments 
+    via interface provided by prompt_recursive.
+
+    Args:
+    - console: Console - object from rich library used for managing the console screen content,
+    - tool: tool object that needs to be called by the user.
+
+    Returns:
+    filled_schema: dict - dictionary containing keys from the tool arguments schema, and values given by the user.
+    """
     args = {}
 
     # Prompting user for all tool args
@@ -93,6 +115,17 @@ def make_tool_call(console: Console, tool) -> dict:
     }
 
 def create_message_panel(message: BaseMessage, title="Message") -> Panel:
+    """
+    Function for creating standard message panel, changing its characteristics 
+    (e.g.: frame colour, box title) depending on the message type.
+
+    Args:
+    - message: BaseMessage - message object from which data will be displayed in the message panel,
+    - title: str - text displayed on top of the message box.
+
+    Returns:
+    message_panel: Panel - object from rich library that can be displayed on the console screen.
+    """
     messgage_content = Markdown(message.content)
     panel_colour = "magenta" if message.type == "ai" else ("green" if message.type == "tool" else ("cyan" if message.type == "system" else "rosy_brown"))
     
@@ -130,6 +163,20 @@ def create_message_panel(message: BaseMessage, title="Message") -> Panel:
     )
 
 def respond(console: Console, agent_name, response_msg_content="", response_msg_tool_calls=[], tools=[]) -> Optional[AIMessage]:
+    """
+    Function used to construct the AIMessage to add the user's response to the list of agent messages, 
+    as if they were an AI agent participating in the simulation.
+
+    Args:
+    - console: Console - object from rich library used for managing the console screen content,
+    - agent_name: str - the agent identifier, used to distinguish it from other agents within the MAS, 
+    - response_msg_content: str - already existing content of the message (in case of editing the response),
+    - response_msg_tool_call: list - already existing list of tool calls (in case of editing the response),
+    - tools: list - tools available to be used by this agent.
+
+    Returns:
+    ai_message: AIMessage - message object created by the user.
+    """
     content = response_msg_content
     tool_calls = response_msg_tool_calls
 
@@ -221,6 +268,20 @@ def respond(console: Console, agent_name, response_msg_content="", response_msg_
     )
 
 def human(messages: list[BaseMessage], agent_name: str, tools:list =[], msg_list_length: int=5) -> list[BaseMessage]:
+    """
+    Function allowing user to emulate the functioning of an LLM, and return appropriate AIMessage objects.
+    Displays console user interface, to display previously sent or received messages.
+    Used for debugging the Multi-Agent Systems, by supplying this function instead of an agent node.
+
+    Args:
+    - messages: list[BaseMessage] - list of message objects already existing on this agent's log,
+    - agent_name: str - the agent identifier, used to distinguish it from other agents within the MAS,
+    - tools: list - tools available to be used by this agent, 
+    - msg_list_length: int - number of messages that can be displayed at the same time on the same console screen.
+
+    Returns:
+    message_list: list[BaseMessage] - list containing nlanggraph message objects added by the user.
+    """
     console = Console()
     responses = []
     bottom_range=max(0, len(messages) - msg_list_length)
@@ -319,55 +380,3 @@ def human(messages: list[BaseMessage], agent_name: str, tools:list =[], msg_list
             break
 
     return responses
-
-# DEVELOPMENT
-'''
-from langchain_core.tools import tool
-@tool
-def think_tool(reflection: str) -> str:
-    """Tool for strategic reflection on the simulation state and decision-making.
-
-    Use this tool after each interaction with environment, other players or agents within your system and plan next steps systematically.
-    This creates a deliberate pause in the planning process for quality decision-making.
-
-    When to use:
-    - After receiving the information from the environment: How does new information influences my plans?
-    - Before making the final decision: Can I make well informed decision?
-    
-    Reflection should address:
-    1. Analysis of the currently gathered information - What do I know about the problem at hand?
-    2. Missing information assessment - What more information can I gather about the problem?
-    3. Predicted consequences - What will be the result of considered possiblities?
-    4. Strategic decision - Should I continue observing the environment or make the decision now?
-
-    Args:
-        reflection: Your detailed reflection on the problem at hand, findings, and next steps
-
-    Returns:
-        Confirmation that reflection was recorded for decision-making
-    """
-
-    return f"Reflection recorded: {reflection}"
-
-
-from langchain_core.messages import SystemMessage, ToolMessage, AIMessage, HumanMessage
-messages = [
-    SystemMessage(content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque consectetur varius lectus, et mollis mi viverra sed. Ut eu ante non tellus egestas tincidunt. Quisque ac dui sit amet est varius molestie. Maecenas quis tincidunt felis. Pellentesque vel aliquet ante, dapibus lobortis mi. Nulla ut ultricies tortor. Etiam vel molestie purus. Cras pulvinar, tellus eu scelerisque placerat, arcu purus sagittis nibh, eget faucibus ex nisi a dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."),
-    HumanMessage(content="Vestibulum in quam nec dolor fringilla auctor. Maecenas tristique luctus odio, et semper ex congue ut. Nulla vehicula mollis ex, eu elementum tortor pharetra id. Etiam leo nibh, eleifend in elit sit amet, mattis interdum arcu. Praesent bibendum, diam sed varius hendrerit, tortor nulla lobortis mi, eget consequat risus enim eget dui. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam et tincidunt neque. Vivamus in dui id lorem vestibulum maximus a ac mauris."),
-    AIMessage(content="Sed pretium placerat tellus. Nunc neque turpis, dictum vel congue in, viverra ac ex. Curabitur ullamcorper orci ac laoreet cursus. Curabitur a malesuada purus, et ornare mi. Nullam faucibus sapien eget nisi iaculis ultricies. Fusce non laoreet urna, at tempor elit. Fusce in lectus arcu. Etiam laoreet massa quis metus scelerisque, a mollis libero porttitor. Vivamus sed quam nisl. Etiam egestas ultricies libero ut efficitur. In interdum vulputate magna nec feugiat. Cras tristique eu ante id congue. Suspendisse nec consectetur turpis. Morbi ligula nunc, auctor ornare nisl ut, volutpat sagittis mi. Sed sed nulla eleifend, euismod erat a, blandit sapien."),
-    ToolMessage(tool_call_id="call_Jja7J89XsjrOLA5r!MEOW!SL", content="In orci ligula, porta euismod magna in, sollicitudin porttitor mi. In tincidunt felis commodo, vestibulum velit vel, varius justo. Sed nulla orci, blandit quis convallis a, scelerisque eget nunc. Nulla facilisis metus sed turpis luctus rhoncus. Etiam at nibh fermentum metus tincidunt tincidunt. Nunc vitae purus euismod, congue massa molestie, vehicula erat. Suspendisse facilisis pulvinar facilisis. Mauris mollis quis lacus ut mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis odio felis, auctor sit amet tortor sed, fringilla imperdiet massa. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Fusce congue, risus ut euismod tempus, massa massa molestie justo, congue fermentum arcu magna quis orci. Duis faucibus mi leo, in tincidunt arcu fringilla ac. Praesent sed tortor sed ante egestas malesuada vel a enim. Vivamus id velit vestibulum, faucibus enim eget, ullamcorper massa."),
-    ToolMessage(tool_call_id="call_Jja7J89XsjrOLA5r!MEOW!SL", content="Fusce non fermentum quam. Nulla facilisi. Aenean tempor tempus metus quis efficitur. Maecenas commodo congue diam sed viverra. Aenean et ante at ante feugiat suscipit. Nulla at dolor pharetra, sodales erat eu, gravida lorem. In aliquam ac ipsum sed posuere. Sed in ex porta, vehicula sem id, tempor ex. Maecenas efficitur velit fringilla dignissim sodales. Sed egestas erat id est auctor, vel finibus mi tincidunt. Cras mi ante, fringilla ut maximus in, mollis id purus. Cras faucibus iaculis pharetra. Maecenas efficitur urna sit amet sapien luctus, at suscipit tortor mattis."),
-    AIMessage(additional_kwargs={"tool_calls": [{"id": "12345", "name": "super_tool", "args": {}}]}, content="Cras sed purus commodo, dignissim enim scelerisque, accumsan quam. Donec et quam vel magna tincidunt placerat. In eu neque dui. Etiam at faucibus velit. Phasellus mattis luctus vestibulum. Duis nisl massa, imperdiet quis pharetra ut, fermentum ut lacus. Cras convallis convallis condimentum. Praesent ultrices maximus felis in malesuada. Proin mollis quis leo et placerat. Proin ut felis laoreet, condimentum dolor et, aliquam quam. Duis euismod mi ac hendrerit rutrum. Fusce sed mi vel arcu suscipit molestie. Etiam feugiat ac tortor sit amet venenatis. Proin maximus sodales rhoncus. Donec luctus, tellus tristique sollicitudin mattis, nisl dui ultrices lectus, vitae vehicula massa felis at mauris. Suspendisse tincidunt dictum pharetra."),
-    ToolMessage(tool_call_id="call_Jja7J89XsjrOLA5r!MEOW!SL", content="Nunc sollicitudin tempor urna, ut aliquet risus cursus a. In efficitur id odio quis posuere. Aliquam in nunc at quam molestie pretium. Phasellus a interdum risus, eget pulvinar sapien. Nunc a ex eu leo dictum finibus. Sed molestie nisl suscipit turpis commodo accumsan non eleifend felis. Aenean urna velit, finibus non posuere sed, vestibulum non risus. Sed dui orci, aliquet eu imperdiet lobortis, sodales vitae felis. Integer nulla nisl, volutpat finibus mauris vitae, maximus tempor nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Fusce eu tincidunt est. In aliquam est quis massa laoreet, in dapibus erat convallis. Nullam aliquam, mauris vitae cursus elementum, tortor felis consequat nisl, eget malesuada velit leo non tellus. Praesent accumsan erat ac volutpat tincidunt."),
-    ToolMessage(tool_call_id="call_Jja7J89XsjrOLA5r!MEOW!SL", content="Pellentesque eget mauris vel orci sodales sagittis ut nec tellus. Morbi vel felis et nisi aliquet facilisis eu eget odio. Aliquam metus nulla, auctor a sagittis et, porta tristique enim. Vestibulum quis nisi vitae libero porttitor sagittis. In rhoncus felis nulla, non egestas nisi tincidunt et. Mauris imperdiet nibh eget suscipit rhoncus. Cras gravida nibh eget justo efficitur euismod. Aliquam urna mauris, aliquam et erat eu, accumsan vehicula ligula. Mauris sit amet mi neque. Fusce eget turpis vitae turpis lobortis vehicula quis sit amet velit."),
-    ToolMessage(tool_call_id="call_Jja7J89XsjrOLA5r!MEOW!SL", content="Curabitur id mi et tortor ultrices posuere sit amet vitae mi. Quisque eu quam sed orci finibus efficitur in et mauris. Vivamus varius, est sit amet scelerisque pharetra, arcu ligula viverra nunc, suscipit pellentesque urna justo vel justo. Pellentesque lobortis fermentum nisi vitae volutpat. Praesent cursus, elit in feugiat facilisis, felis augue ultrices ipsum, in lacinia leo tellus nec augue. Sed vel velit ut risus scelerisque euismod id ut purus. Quisque vulputate interdum mauris non malesuada. Suspendisse non dolor ut erat luctus cursus sed eget nisl. Mauris maximus lorem sit amet mi finibus, tincidunt mollis tellus gravida. Cras scelerisque dolor pulvinar nisl molestie, sit amet congue justo lobortis. Quisque et pulvinar turpis, sit amet luctus sapien. Vestibulum vulputate efficitur mauris, sed fringilla enim dapibus nec. Nam at mi posuere, finibus nulla ut, eleifend ligula."),
-    AIMessage(content="Ut in orci scelerisque, consectetur augue quis, blandit lacus. Mauris consequat, lorem eget aliquet viverra, lorem nibh suscipit nunc, at rhoncus purus purus sed eros. Etiam tempor urna et lobortis porta. Curabitur purus velit, consequat sed nisi in, volutpat accumsan velit. Sed luctus mattis consectetur. Aenean eu laoreet erat, vitae eleifend nisi. Nullam maximus porttitor nisl ut efficitur. In ligula risus, fermentum nec elit ac, aliquet dapibus lacus."),
-    HumanMessage(content="Quisque vel accumsan est. Curabitur nibh augue, accumsan id neque eget, vestibulum euismod ante. Maecenas malesuada maximus arcu et hendrerit. Sed sollicitudin, tellus ac maximus porta, libero erat aliquet justo, sed volutpat ipsum nisl id justo. Vestibulum eu ipsum et libero efficitur facilisis. Mauris eleifend dictum tempus. Mauris id nisi quam. Donec consectetur finibus pharetra. Phasellus et pulvinar velit. Sed ac blandit leo. Nulla facilisi. Nam sit amet mauris euismod, consequat turpis at, volutpat ex. Sed sit amet libero facilisis, porta leo non, volutpat leo. Proin non pulvinar elit. Fusce sollicitudin ligula ac metus sollicitudin cursus."),
-    AIMessage(content="Vestibulum ornare volutpat lectus id bibendum. Proin cursus at nisl id placerat. Aliquam dignissim placerat porttitor. Phasellus eget enim at mauris semper mollis sit amet eu felis. Nulla non mauris id tellus faucibus posuere. Ut orci eros, convallis in orci ut, molestie rutrum est. Sed consectetur, turpis sit amet volutpat placerat, purus magna luctus justo, quis feugiat tellus leo et enim. Curabitur nunc orci, porttitor non suscipit in, iaculis non neque. Nam et libero sapien.")
-]
-agent_name="Leader Agent"
-tools = [think_tool]
-
-
-human(messages, agent_name, tools=tools)
-'''
