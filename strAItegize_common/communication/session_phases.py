@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class SessionPhase(Enum):
+class SessionPhase(IntEnum):
     LobbyPhase = 1
     UpkeepPhase = 2
     PlanningPhase = 3

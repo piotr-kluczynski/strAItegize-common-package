@@ -1,6 +1,6 @@
 from enum import Enum
 
-class MessageType(Enum):
+class MessageType(str, Enum):
     ObserveUnit = "OBSERVE_UNIT"
     ObserveRegion = "OBSERVE_REGION"
     GetUnits = "GET_UNITS"
