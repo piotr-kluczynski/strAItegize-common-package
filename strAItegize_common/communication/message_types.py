@@ -6,6 +6,7 @@ class MessageType(str, Enum):
     GetUnits = "GET_UNITS"
     GetRegions = "GET_REGIONS"
     GetUnitDetails = "GET_UNIT_DETAILS"
+    GetRegionDetails = "GET_REGION_DETAILS"
     GetPlayers = "GET_PLAYERS"
     IssueOrders = "ISSUE_ORDERS"
     RecruitUnits = "RECRUIT_UNITS"
