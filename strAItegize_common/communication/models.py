@@ -98,4 +98,6 @@ class GetPlayerConversationResponse(BaseModel):
     pass
 
 class ErrorResponse(BaseModel):
+    error: bool
     desc: str
+    details: str
