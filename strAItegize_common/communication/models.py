@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Any
 
-from others.order import Order
-from others.recruitment_choice import RecruitmentChoice
+from ..others.order import Order
+from ..others.recruitment_choice import RecruitmentChoice
 
 # Observation Model
 class TileObservation(BaseModel):
@@ -12,7 +12,6 @@ class TileObservation(BaseModel):
     owner: str
     region: str
     is_command_center: bool
-
 
 # Base Message Wrapper
 class NetworkMessage(BaseModel):
@@ -46,12 +45,6 @@ class IssueOrdersReuqest(BaseModel):
 
 class RecruitmentChoiceRequest(BaseModel):
     recruitment: List[RecruitmentChoice]
-
-class MessagePlayerRequest(BaseModel):
-    pass
-
-class GetPlayerConversationRequest(BaseModel):
-    pass
 
 # Responses
 class ObserveUnitResponse(BaseModel):
@@ -91,13 +84,7 @@ class IssueOrdersResponse(BaseModel):
 class RecruitmentChoiceResponse(BaseModel):
     pass
 
-class MessagePlayerResponse(BaseModel):
-    pass
-
-class GetPlayerConversationResponse(BaseModel):
-    pass
-
 class ErrorResponse(BaseModel):
-    error: bool
+    error: bool = True
     desc: str
     details: str

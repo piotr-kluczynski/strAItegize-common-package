@@ -376,7 +376,7 @@ def human(messages: list[BaseMessage], agent_name: str, tools:list =[], msg_list
         elif decision == "Send":
             break
         elif decision == "Close":
-            responses = []
+            responses = [AIMessage(content="", tool_calls=[])]
             break
 
     return responses
