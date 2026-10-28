@@ -3,6 +3,7 @@ from enum import Enum
 class MessageType(str, Enum):
     ObserveUnit = "OBSERVE_UNIT"
     ObserveRegion = "OBSERVE_REGION"
+    GetTiles = "GET_TILES"
     GetUnits = "GET_UNITS"
     GetRegions = "GET_REGIONS"
     GetUnitDetails = "GET_UNIT_DETAILS"
@@ -18,3 +19,4 @@ class MessageType(str, Enum):
     EndSimulation = "END_SIMULATION"
     StartRound = "START_ROUND"
     EndRound = "END_ROUND"
+    Error = "ERROR"

@@ -9,7 +9,7 @@ class TileObservation(BaseModel):
     rel_coord: str
     distance: int
     unit: str
-    owner: str
+    owner: str | None
     region: str
     is_command_center: bool
 
@@ -24,6 +24,9 @@ class ObserveUnitRequest(BaseModel):
 
 class ObserveRegionRequest(BaseModel):
     region_id: str
+
+class GetTilesRequest(BaseModel):
+    pass
 
 class GetUnitsRequest(BaseModel):
     pass
@@ -53,6 +56,9 @@ class ObserveUnitResponse(BaseModel):
 class ObserveRegionResponse(BaseModel):
     observations: Dict[str, TileObservation]
 
+class GetTilesResponse(BaseModel):
+    tiles_list: Dict[str, TileObservation]
+
 class GetUnitsResponse(BaseModel):
     units_list: List[str]
 
@@ -61,7 +67,7 @@ class GetRegionsResponse(BaseModel):
 
 class GetUnitDetailsResponse(BaseModel):
     unit_id: str
-    owner: str
+    owner: str | None
     coord: str
     movement: int
     upkeep: int
@@ -69,7 +75,7 @@ class GetUnitDetailsResponse(BaseModel):
 
 class GetRegionDetailsResponse(BaseModel):
     region_id: str
-    owner: str
+    owner: str | None
     command_center_coord: str
     region_upkeep: int
     size: int
