@@ -9,6 +9,8 @@ setup(
     install_requires=[
         'pydantic',
         'rich',
-        'langchain_core'
+        'langchain_core',
+        'langchain_chroma',
+        'langchain_openai',
     ],
 )
